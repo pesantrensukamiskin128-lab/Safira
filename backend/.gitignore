@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# .env.production disertakan di repo untuk referensi deploy
+# (rename menjadi .env di server)
+
+# Frontend build output (di-generate saat deploy)
+# public/
+
+# Uploads (file yang diupload user, jangan ikut ke repo)
+uploads/*/
+
+# PDF yang di-generate
+uploads/pdf/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Test files
+test-*.pdf

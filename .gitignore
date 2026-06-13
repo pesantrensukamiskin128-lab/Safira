@@ -1,0 +1,10 @@
+# SQL export — berisi data sensitif, jangan push ke repo
+*.sql
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
