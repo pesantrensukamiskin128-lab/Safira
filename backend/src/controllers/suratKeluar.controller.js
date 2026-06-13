@@ -12,7 +12,6 @@ const suratInclude = {
   pembuat:        { select: { id: true, namaLengkap: true, jabatan: true, role: true } },
   tataUsaha:      { select: { id: true, namaLengkap: true, jabatan: true, nuptk: true } },
   kepala:         { select: { id: true, namaLengkap: true, jabatan: true, nuptk: true } },
-  dewanMasyayikh: { select: { id: true, namaLengkap: true, jabatan: true, nuptk: true } },
   penerimaInternal: {
     include: { user: { select: { id: true, namaLengkap: true, jabatan: true, role: true } } }
   },
@@ -29,8 +28,6 @@ const getAllSurat = async (req, res) => {
       where.tataUsahaId = req.user.id;
     } else if (req.user.role === 'KEPALA') {
       where.kepalaId = req.user.id;
-    } else if (req.user.role === 'DEWAN_MASYAYIKH') {
-      where.dewanMasyayikhId = req.user.id;
     } else if (req.user.role === 'PENGURUS') {
       where.penerimaInternal = { some: { userId: req.user.id } };
       where.status = 'SELESAI';
@@ -83,7 +80,7 @@ const createSurat = async (req, res) => {
     const {
       jenisSurat = 'A', perihal, lampiran, isiSurat, lampiranIsi,
       tujuanSurat, tanggalMasehi, tempatTerbit,
-      tataUsahaId, kepalaId, dewanMasyayikhId,
+      tataUsahaId, kepalaId,
       penerimaEksternal, penerimaInternalIds,
       isDraft = true,
     } = req.body;
@@ -108,7 +105,6 @@ const createSurat = async (req, res) => {
         status:           isDraft ? 'DRAFT' : 'MENUNGGU_SEKRETARIS',
         tataUsahaId:      tataUsahaId      || null,
         kepalaId:         kepalaId         || null,
-        dewanMasyayikhId: dewanMasyayikhId || null,
         pembuatId:        req.user.id,
         penerimaEksternal: penerimaEksternal || null,
       },
@@ -139,13 +135,13 @@ const updateSurat = async (req, res) => {
     const existing = await prisma.suratKeluar.findUnique({ where: { id } });
     if (!existing) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
 
-    if (!['DRAFT','DITOLAK_SEKRETARIS','DITOLAK_KEPALA','DITOLAK_DEWAN_MASYAYIKH'].includes(existing.status))
+    if (!['DRAFT','DITOLAK_SEKRETARIS','DITOLAK_KEPALA'].includes(existing.status))
       return res.status(400).json({ success: false, message: 'Surat tidak dapat diedit pada status ini' });
 
     const {
       jenisSurat, perihal, lampiran, isiSurat, lampiranIsi,
       tujuanSurat, tanggalMasehi, tempatTerbit,
-      tataUsahaId, kepalaId, dewanMasyayikhId,
+      tataUsahaId, kepalaId,
       penerimaEksternal, penerimaInternalIds,
       isDraft = true,
     } = req.body;
@@ -170,15 +166,12 @@ const updateSurat = async (req, res) => {
         status:           isDraft ? 'DRAFT' : 'MENUNGGU_SEKRETARIS',
         tataUsahaId:      tataUsahaId      !== undefined ? tataUsahaId      : existing.tataUsahaId,
         kepalaId:         kepalaId         !== undefined ? kepalaId         : existing.kepalaId,
-        dewanMasyayikhId: dewanMasyayikhId !== undefined ? dewanMasyayikhId : existing.dewanMasyayikhId,
         penerimaEksternal: penerimaEksternal !== undefined ? penerimaEksternal : existing.penerimaEksternal,
         catatanTolak:         isDraft ? existing.catatanTolak : null,
         parafTataUsaha:       false,
         ttdKepala:            false,
-        ttdDewanMasyayikh:    false,
         tglParafTataUsaha:    null,
         tglTtdKepala:         null,
-        tglTtdDewanMasyayikh: null,
       },
       include: suratInclude,
     });
@@ -229,14 +222,14 @@ const kirimSurat = async (req, res) => {
     const { id } = req.params;
     const surat = await prisma.suratKeluar.findUnique({ where: { id } });
     if (!surat) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
-    if (!['DRAFT','DITOLAK_SEKRETARIS','DITOLAK_KEPALA','DITOLAK_DEWAN_MASYAYIKH'].includes(surat.status))
+    if (!['DRAFT','DITOLAK_SEKRETARIS','DITOLAK_KEPALA'].includes(surat.status))
       return res.status(400).json({ success: false, message: 'Surat tidak dapat dikirim pada status ini' });
     if (!surat.tataUsahaId)
       return res.status(400).json({ success: false, message: 'Pilih Sekretaris terlebih dahulu' });
 
     const updated = await prisma.suratKeluar.update({
       where: { id },
-      data: { status: 'MENUNGGU_SEKRETARIS', catatanTolak: null, parafTataUsaha: false, ttdKepala: false, ttdDewanMasyayikh: false, tglParafTataUsaha: null, tglTtdKepala: null, tglTtdDewanMasyayikh: null },
+      data: { status: 'MENUNGGU_SEKRETARIS', catatanTolak: null, parafTataUsaha: false, ttdKepala: false, tglParafTataUsaha: null, tglTtdKepala: null },
       include: suratInclude,
     });
 
@@ -270,10 +263,10 @@ const tandaTangan = async (req, res) => {
       updateData = {
         parafTataUsaha: true,
         tglParafTataUsaha: new Date(),
-        status: surat.kepalaId ? 'MENUNGGU_KEPALA' : (surat.dewanMasyayikhId ? 'MENUNGGU_DEWAN_MASYAYIKH' : 'SELESAI'),
+        status: surat.kepalaId ? 'MENUNGGU_KEPALA' : 'SELESAI',
       };
 
-      if (!surat.kepalaId && !surat.dewanMasyayikhId) {
+      if (!surat.kepalaId) {
         const nomorSurat = await generateNomorSurat(surat.jenisSurat);
         const qrToken    = uuidv4();
         const qrPath     = await generateQRCode(qrToken, id);
@@ -285,36 +278,12 @@ const tandaTangan = async (req, res) => {
       if (surat.status !== 'MENUNGGU_KEPALA' || surat.kepalaId !== req.user.id)
         return res.status(403).json({ success: false, message: 'Tidak dapat menandatangani surat ini' });
 
-      // Jika ada Dewan Masyayikh, lanjut ke sana; kalau tidak, selesai
-      if (surat.dewanMasyayikhId) {
-        updateData = {
-          ttdKepala: true,
-          tglTtdKepala: new Date(),
-          status: 'MENUNGGU_DEWAN_MASYAYIKH',
-        };
-      } else {
-        const nomorSurat = await generateNomorSurat(surat.jenisSurat);
-        const qrToken    = uuidv4();
-        const qrPath     = await generateQRCode(qrToken, id);
-        updateData = {
-          ttdKepala: true,
-          tglTtdKepala: new Date(),
-          status: 'SELESAI',
-          nomorSurat,
-          qrCodeToken: qrToken,
-          qrCodePath:  qrPath,
-        };
-      }
-    } else if (req.user.role === 'DEWAN_MASYAYIKH') {
-      if (surat.status !== 'MENUNGGU_DEWAN_MASYAYIKH' || surat.dewanMasyayikhId !== req.user.id)
-        return res.status(403).json({ success: false, message: 'Tidak dapat menandatangani surat ini' });
-
       const nomorSurat = await generateNomorSurat(surat.jenisSurat);
       const qrToken    = uuidv4();
       const qrPath     = await generateQRCode(qrToken, id);
       updateData = {
-        ttdDewanMasyayikh: true,
-        tglTtdDewanMasyayikh: new Date(),
+        ttdKepala: true,
+        tglTtdKepala: new Date(),
         status: 'SELESAI',
         nomorSurat,
         qrCodeToken: qrToken,
@@ -326,7 +295,7 @@ const tandaTangan = async (req, res) => {
 
     const updated = await prisma.suratKeluar.update({ where: { id }, data: updateData, include: suratInclude });
 
-    // Notifikasi: Sekretaris tandatangan → kirim ke Kepala atau Dewan Masyayikh
+    // Notifikasi: Sekretaris tandatangan → kirim ke Kepala
     if (req.user.role === 'SEKRETARIS') {
       if (updateData.status === 'MENUNGGU_KEPALA' && updated.kepalaId) {
         await createNotifikasi(updated.kepalaId, {
@@ -334,22 +303,7 @@ const tandaTangan = async (req, res) => {
           pesan: `Surat "${updated.perihal}" perlu ditandatangani`,
           url: `/surat-keluar/${updated.id}`,
         });
-      } else if (updateData.status === 'MENUNGGU_DEWAN_MASYAYIKH' && updated.dewanMasyayikhId) {
-        await createNotifikasi(updated.dewanMasyayikhId, {
-          judul: '✍️ Surat Menunggu Tanda Tangan Dewan Masyayikh',
-          pesan: `Surat "${updated.perihal}" perlu ditandatangani`,
-          url: `/surat-keluar/${updated.id}`,
-        });
       }
-    }
-
-    // Notifikasi: Kepala TTD → kirim ke Dewan Masyayikh
-    if (req.user.role === 'KEPALA' && updateData.status === 'MENUNGGU_DEWAN_MASYAYIKH' && updated.dewanMasyayikhId) {
-      await createNotifikasi(updated.dewanMasyayikhId, {
-        judul: '✍️ Surat Menunggu Tanda Tangan Dewan Masyayikh',
-        pesan: `Surat "${updated.perihal}" perlu ditandatangani`,
-        url: `/surat-keluar/${updated.id}`,
-      });
     }
 
     // Notifikasi: surat SELESAI → kirim ke semua penerima internal
@@ -388,10 +342,6 @@ const tolakSurat = async (req, res) => {
       if (surat.status !== 'MENUNGGU_KEPALA' || surat.kepalaId !== req.user.id)
         return res.status(403).json({ success: false, message: 'Tidak dapat menolak surat ini' });
       newStatus = 'DITOLAK_KEPALA';
-    } else if (req.user.role === 'DEWAN_MASYAYIKH') {
-      if (surat.status !== 'MENUNGGU_DEWAN_MASYAYIKH' || surat.dewanMasyayikhId !== req.user.id)
-        return res.status(403).json({ success: false, message: 'Tidak dapat menolak surat ini' });
-      newStatus = 'DITOLAK_DEWAN_MASYAYIKH';
     } else {
       return res.status(403).json({ success: false, message: 'Tidak memiliki izin' });
     }
@@ -440,8 +390,6 @@ const previewPDF = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Akses ditolak' });
     if (req.user.role === 'KEPALA' && surat.kepalaId !== req.user.id)
       return res.status(403).json({ success: false, message: 'Akses ditolak' });
-    if (req.user.role === 'DEWAN_MASYAYIKH' && surat.dewanMasyayikhId !== req.user.id)
-      return res.status(403).json({ success: false, message: 'Akses ditolak' });
 
     const organisasi = await prisma.organisasiProfil.findFirst();
     const { filepath } = await generateSuratPDF(surat, organisasi || {});
@@ -468,9 +416,9 @@ const getStatistik = async (req, res) => {
     const [total, draft, menunggu, selesai, ditolak] = await Promise.all([
       prisma.suratKeluar.count(),
       prisma.suratKeluar.count({ where: { status: 'DRAFT' } }),
-      prisma.suratKeluar.count({ where: { status: { in: ['MENUNGGU_SEKRETARIS','MENUNGGU_KEPALA','MENUNGGU_DEWAN_MASYAYIKH'] } } }),
+      prisma.suratKeluar.count({ where: { status: { in: ['MENUNGGU_SEKRETARIS','MENUNGGU_KEPALA'] } } }),
       prisma.suratKeluar.count({ where: { status: 'SELESAI' } }),
-      prisma.suratKeluar.count({ where: { status: { in: ['DITOLAK_SEKRETARIS','DITOLAK_KEPALA','DITOLAK_DEWAN_MASYAYIKH'] } } }),
+      prisma.suratKeluar.count({ where: { status: { in: ['DITOLAK_SEKRETARIS','DITOLAK_KEPALA'] } } }),
     ]);
     res.json({ success: true, data: { total, draft, menunggu, selesai, ditolak } });
   } catch (err) {

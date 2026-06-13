@@ -91,9 +91,8 @@ export default function SuratKeluarDetailPage() {
   if (!surat) return <div className="text-center py-20 text-gray-400">Surat tidak ditemukan</div>
 
   const canSign = (
-    (user?.role === 'SEKRETARIS'       && surat.status === 'MENUNGGU_SEKRETARIS'       && surat.tataUsahaId      === user.id) ||
-    (user?.role === 'KEPALA'           && surat.status === 'MENUNGGU_KEPALA'           && surat.kepalaId         === user.id) ||
-    (user?.role === 'DEWAN_MASYAYIKH'  && surat.status === 'MENUNGGU_DEWAN_MASYAYIKH'  && surat.dewanMasyayikhId === user.id)
+    (user?.role === 'SEKRETARIS' && surat.status === 'MENUNGGU_SEKRETARIS' && surat.tataUsahaId === user.id) ||
+    (user?.role === 'KEPALA'     && surat.status === 'MENUNGGU_KEPALA'     && surat.kepalaId    === user.id)
   )
 
   const canReject = canSign
@@ -125,7 +124,7 @@ export default function SuratKeluarDetailPage() {
               <EyeIcon className="w-4 h-4" /> Preview PDF
             </button>
           )}
-          {user?.role === 'ADMIN' && ['DRAFT', 'DITOLAK_SEKRETARIS', 'DITOLAK_KEPALA', 'DITOLAK_DEWAN_MASYAYIKH'].includes(surat.status) && (
+          {user?.role === 'ADMIN' && ['DRAFT', 'DITOLAK_SEKRETARIS', 'DITOLAK_KEPALA'].includes(surat.status) && (
             <Link to={`/surat-keluar/edit/${id}`} className="btn-secondary">
               <PencilIcon className="w-4 h-4" /> Edit
             </Link>
@@ -250,32 +249,6 @@ export default function SuratKeluarDetailPage() {
                   )}
                 </div>
               </div>
-
-              {/* Dewan Masyayikh — hanya tampil jika dipilih */}
-              {surat.dewanMasyayikhId && (
-                <>
-                  <div className="w-px h-4 bg-gray-200 ml-4" />
-                  <div className="flex gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      surat.ttdDewanMasyayikh ? 'bg-green-100' : 'bg-gray-100'
-                    }`}>
-                      {surat.ttdDewanMasyayikh
-                        ? <CheckCircleIcon className="w-5 h-5 text-green-600" />
-                        : <span className="text-gray-400 text-xs font-bold">3</span>
-                      }
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">
-                        {surat.dewanMasyayikh?.namaLengkap || 'Dewan Masyayikh belum dipilih'}
-                      </p>
-                      <p className="text-xs text-gray-400">{surat.dewanMasyayikh?.jabatan || 'Dewan Masyayikh (Tanda Tangan)'}</p>
-                      {surat.tglTtdDewanMasyayikh && (
-                        <p className="text-xs text-green-600 mt-0.5">✓ TTD: {formatDateTime(surat.tglTtdDewanMasyayikh)}</p>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
             </div>
           </div>
 

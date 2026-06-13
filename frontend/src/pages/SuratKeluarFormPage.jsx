@@ -68,7 +68,6 @@ const defaultForm = {
   tempatTerbit: 'Bandung',
   tataUsahaId: '',
   kepalaId: '',
-  dewanMasyayikhId: '',
   penerimaEksternal: '',
   penerimaInternalIds: [],
 }
@@ -99,11 +98,6 @@ export default function SuratKeluarFormPage() {
     queryFn: () => userAPI.getByRole('SEKRETARIS').then(r => r.data.data),
   })
 
-  const { data: dewanMasyayikhList } = useQuery({
-    queryKey: ['users-dewan-masyayikh'],
-    queryFn: () => userAPI.getByRole('DEWAN_MASYAYIKH').then(r => r.data.data),
-  })
-
   const { data: templates } = useQuery({
     queryKey: ['template-surat'],
     queryFn: () => templateAPI.getAll().then(r => r.data.data),
@@ -131,7 +125,6 @@ export default function SuratKeluarFormPage() {
         tempatTerbit:        existingSurat.tempatTerbit         || 'Bandung',
         tataUsahaId:         existingSurat.tataUsahaId          || '',
         kepalaId:            existingSurat.kepalaId             || '',
-        dewanMasyayikhId:    existingSurat.dewanMasyayikhId     || '',
         penerimaEksternal:   existingSurat.penerimaEksternal    || '',
         penerimaInternalIds: existingSurat.penerimaInternal?.map(p => p.userId) || [],
       })
@@ -393,19 +386,9 @@ export default function SuratKeluarFormPage() {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="label">Dewan Masyayikh <span className="text-xs text-gray-400">(opsional)</span></label>
-              <select className="input-field" value={form.dewanMasyayikhId}
-                onChange={e => setForm(p => ({ ...p, dewanMasyayikhId: e.target.value }))}>
-                <option value="">— Tanpa Dewan Masyayikh —</option>
-                {dewanMasyayikhList?.map(u => (
-                  <option key={u.id} value={u.id}>{u.namaLengkap}</option>
-                ))}
-              </select>
-            </div>
             <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500">
               <p className="font-medium text-gray-700 mb-1">Alur penandatanganan:</p>
-              <p>1. Sekretaris menandatangani → 2. Ketua menandatangani{form.dewanMasyayikhId ? ' → 3. Dewan Masyayikh menandatangani' : ''}</p>
+              <p>1. Sekretaris menandatangani → 2. Ketua menandatangani</p>
             </div>
           </div>
 

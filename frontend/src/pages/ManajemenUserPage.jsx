@@ -12,7 +12,7 @@ import { PageLoader } from '../components/ui/LoadingSpinner'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 
-const ROLES = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH', 'PENGURUS']
+const ROLES = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'PENGURUS']
 const defaultForm = { email: '', password: '', namaLengkap: '', jabatan: '', nomorHp: '', nuptk: '', role: 'PENGURUS' }
 
 export default function ManajemenUserPage() {

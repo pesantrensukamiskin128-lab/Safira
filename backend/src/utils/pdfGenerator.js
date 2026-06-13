@@ -1140,7 +1140,6 @@ async function renderBodyBlocks(doc, blocks, startY, kopHeight, organisasi, foot
 // ── TANDA TANGAN ─────────────────────────────────────────────────────────────
 // ── TANDA TANGAN ─────────────────────────────────────────────────────────────
 // Layout 2 kolom: Ketua (kiri) dan Sekretaris (kanan)
-// + Dewan Masyayikh (opsional) di bawah tengah dengan "Mengetahui:"
 async function drawTandaTangan(doc, surat, startY, qrDataUrl) {
   const colW        = 180;
   const gapCol      = CW - colW * 2;
@@ -1151,9 +1150,8 @@ async function drawTandaTangan(doc, surat, startY, qrDataUrl) {
   const qrSz        = 35;
   const gapTtd      = FS_ISI * 4;
 
-  const kepala         = surat.kepala;
-  const sekretaris     = surat.tataUsaha;       // field DB tetap tataUsaha
-  const dewanMasyayikh = surat.dewanMasyayikh;
+  const kepala     = surat.kepala;
+  const sekretaris = surat.tataUsaha;
 
   let y = startY + 4;
 
@@ -1168,8 +1166,6 @@ async function drawTandaTangan(doc, surat, startY, qrDataUrl) {
   y = doc.y + 4;
 
   // ── Baris 2: QR di bawah jabatan ─────────────────────────────────────────
-  // Selalu tampilkan QR di kedua kolom (Ketua & Sekretaris),
-  // baik ada maupun tidak ada Dewan Masyayikh
   if (qrDataUrl) {
     const qrXKetua = xKetua + (colWKetua - qrSz) / 2;
     const qrXSekr  = xSekr  + (colW      - qrSz) / 2;
@@ -1208,50 +1204,7 @@ async function drawTandaTangan(doc, surat, startY, qrDataUrl) {
     }
   }
 
-  let yAfterKolom = doc.y + 4;
-
-  // ── Blok Dewan Masyayikh — di bawah, tengah halaman ──────────────────────
-  if (dewanMasyayikh) {
-    const dmW = 180;
-    const dmX = ML + (CW - dmW) / 2;
-    let   yd  = yAfterKolom + 6;
-
-    // "Mengetahui:"
-    doc.font(F_REG).fontSize(FS_ISI).fillColor('#000000')
-       .text('Mengetahui:', dmX, yd, { width: dmW, align: 'center' });
-    yd = doc.y + 2;
-
-    // Jabatan
-    const jabatanDM = dewanMasyayikh.jabatan || 'Dewan Masyayikh';
-    doc.font(F_REG).fontSize(FS_ISI).fillColor('#000000')
-       .text(jabatanDM + ',', dmX, yd, { width: dmW, align: 'center' });
-    yd = doc.y + 4;
-
-    // QR tengah dalam kolom Dewan Masyayikh
-    if (qrDataUrl) {
-      const qrXdm = dmX + (dmW - qrSz) / 2;
-      try {
-        doc.image(qrDataUrl, qrXdm, yd, { width: qrSz, height: qrSz });
-        const verifikasiUrl = `${getFrontendUrl()}/verifikasi/${surat.qrCodeToken}`;
-        doc.link(qrXdm, yd, qrSz, qrSz, verifikasiUrl);
-      } catch (_) {}
-      yd += qrSz + 4;
-    } else {
-      yd += gapTtd;
-    }
-
-    // Nama Dewan Masyayikh
-    doc.font(F_BOLD).fontSize(FS_ISI).fillColor('#000000')
-       .text(dewanMasyayikh.namaLengkap || '', dmX, yd, { width: dmW, align: 'center' });
-    if (dewanMasyayikh.nuptk) {
-      doc.font(F_REG).fontSize(FS_ISI - 0.5).fillColor('#000000')
-         .text(`NUPTK: ${dewanMasyayikh.nuptk}`, dmX, doc.y + 1, { width: dmW, align: 'center' });
-    }
-
-    return doc.y + 2;
-  }
-
-  return yAfterKolom;
+  return doc.y + 4;
 }
 
 // ── FOOTER HALAMAN BIASA (hanya nomor halaman) ───────────────────────────────

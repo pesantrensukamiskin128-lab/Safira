@@ -42,7 +42,7 @@ export default function DashboardPage() {
   const { data: myDisposisi } = useQuery({
     queryKey: ['my-disposisi-unread'],
     queryFn: () => disposisiAPI.getMy({ sudahDibaca: false }).then(r => r.data.data),
-    enabled: ['PENGURUS', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH'].includes(user?.role),
+    enabled: ['PENGURUS', 'SEKRETARIS', 'KEPALA'].includes(user?.role),
   })
 
   const { data: upcomingAgenda } = useQuery({
@@ -73,7 +73,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Stats Grid */}
-      {(user?.role === 'ADMIN' || user?.role === 'SEKRETARIS' || user?.role === 'KEPALA' || user?.role === 'DEWAN_MASYAYIKH') && (
+      {(user?.role === 'ADMIN' || user?.role === 'SEKRETARIS' || user?.role === 'KEPALA') && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard title="Total Surat Keluar" value={statKeluar?.total} icon={DocumentTextIcon} color="green" delay={0.1} />
           <StatsCard title="Menunggu TTD" value={statKeluar?.menunggu} icon={ClockIcon} color="yellow" delay={0.15} />
@@ -153,7 +153,7 @@ export default function DashboardPage() {
               </>
             )}
 
-            {/* Tampilan ADMIN/SEKRETARIS/KEPALA/DEWAN_MASYAYIKH */}
+            {/* Tampilan ADMIN/SEKRETARIS/KEPALA */}
             {user?.role !== 'PENGURUS' && (
               <>
                 {(!recentKeluar || recentKeluar.length === 0) && (
@@ -217,7 +217,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Surat keluar stats */}
-          {(user?.role === 'ADMIN' || user?.role === 'SEKRETARIS' || user?.role === 'KEPALA' || user?.role === 'DEWAN_MASYAYIKH') && (
+          {(user?.role === 'ADMIN' || user?.role === 'SEKRETARIS' || user?.role === 'KEPALA') && (
             <div className="card p-5">
               <h3 className="section-title mb-4">Status Surat Keluar</h3>
               <div className="space-y-3">

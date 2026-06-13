@@ -13,7 +13,6 @@ const verifySurat = async (req, res) => {
         pembuat: { select: { namaLengkap: true, jabatan: true } },
         tataUsaha: { select: { namaLengkap: true, jabatan: true } },
         kepala: { select: { namaLengkap: true, jabatan: true } },
-        dewanMasyayikh: { select: { namaLengkap: true, jabatan: true } },
         penerimaInternal: {
           include: {
             user: { select: { namaLengkap: true, jabatan: true } }
@@ -60,11 +59,6 @@ const verifySurat = async (req, res) => {
             jabatan: surat.kepala.jabatan,
             tanggalTtd: surat.tglTtdKepala,
           } : null,
-          dewanMasyayikh: surat.dewanMasyayikh ? {
-            nama: surat.dewanMasyayikh.namaLengkap,
-            jabatan: surat.dewanMasyayikh.jabatan,
-            tanggalTtd: surat.tglTtdDewanMasyayikh,
-          } : null,
         },
         organisasi: {
           tingkatan: organisasi?.tingkatanOrg || '',
@@ -74,7 +68,7 @@ const verifySurat = async (req, res) => {
           logoPath: organisasi?.logoPath || null,
         },
         dibuatOleh: surat.pembuat.namaLengkap,
-        tanggalSelesai: surat.tglTtdDewanMasyayikh || surat.tglTtdKepala || surat.tglParafTataUsaha,
+        tanggalSelesai: surat.tglTtdKepala || surat.tglParafTataUsaha,
       }
     });
   } catch (error) {
@@ -98,7 +92,6 @@ const previewPDFPublik = async (req, res) => {
         pembuat:        { select: { namaLengkap: true, jabatan: true } },
         tataUsaha:      { select: { namaLengkap: true, jabatan: true } },
         kepala:         { select: { namaLengkap: true, jabatan: true } },
-        dewanMasyayikh: { select: { namaLengkap: true, jabatan: true } },
         penerimaInternal: {
           include: { user: { select: { namaLengkap: true, jabatan: true } } }
         },

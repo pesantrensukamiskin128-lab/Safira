@@ -50,7 +50,7 @@ const createUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email, password, nama lengkap, dan role diperlukan' });
     }
 
-    const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH', 'PENGURUS'];
+    const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'PENGURUS'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ success: false, message: 'Role tidak valid' });
     }
@@ -101,7 +101,7 @@ const updateUser = async (req, res) => {
     if (nomorHp !== undefined) updateData.nomorHp = nomorHp.trim();
     if (nuptk !== undefined) updateData.nuptk = nuptk?.trim() || null;
     if (role !== undefined) {
-      const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH', 'PENGURUS'];
+      const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'PENGURUS'];
       if (!validRoles.includes(role)) {
         return res.status(400).json({ success: false, message: 'Role tidak valid' });
       }
@@ -215,7 +215,7 @@ const downloadTemplate = async (req, res) => {
       ['jabatan', 'Jabatan dalam organisasi', 'Tidak', 'Ketua Bidang'],
       ['nomorHp', 'Nomor handphone', 'Tidak', '08123456789'],
       ['nuptk', 'Nomor Unik Pendidik dan Tenaga Kependidikan (16 digit)', 'Tidak', '1234567890123456'],
-      ['role', 'Role: ADMIN / SEKRETARIS / KEPALA / DEWAN_MASYAYIKH / PENGURUS', 'Ya', 'PENGURUS'],
+      ['role', 'Role: ADMIN / SEKRETARIS / KEPALA / PENGURUS', 'Ya', 'PENGURUS'],
     ];
     const wsPetunjuk = XLSX.utils.aoa_to_sheet(petunjukData);
     wsPetunjuk['!cols'] = [{ wch: 18 }, { wch: 55 }, { wch: 10 }, { wch: 25 }];
@@ -240,7 +240,7 @@ const exportUsers = async (req, res) => {
       orderBy: { namaLengkap: 'asc' },
     });
 
-    const ROLE_LABEL = { ADMIN: 'Admin', SEKRETARIS: 'Sekretaris', KEPALA: 'Ketua', DEWAN_MASYAYIKH: 'Dewan Masyayikh', PENGURUS: 'Pengurus' };
+    const ROLE_LABEL = { ADMIN: 'Admin', SEKRETARIS: 'Sekretaris', KEPALA: 'Ketua', PENGURUS: 'Pengurus' };
 
     const rows = users.map((u, i) => ({
       No: i + 1,
@@ -287,7 +287,7 @@ const importUsers = async (req, res) => {
       return res.status(400).json({ success: false, message: 'File Excel kosong atau format tidak sesuai' });
     }
 
-    const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH', 'PENGURUS'];
+    const validRoles = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'PENGURUS'];
     const results = { berhasil: 0, gagal: 0, errors: [] };
 
     for (let i = 0; i < rows.length; i++) {

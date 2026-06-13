@@ -96,7 +96,7 @@ export default function SuratMasukPage() {
   const [deleteId, setDeleteId] = useState(null)
 
   const isGuru    = user?.role === 'PENGURUS'
-  const canManage = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH'].includes(user?.role)
+  const canManage = ['ADMIN', 'SEKRETARIS', 'KEPALA'].includes(user?.role)
 
   const { data, isLoading } = useQuery({
     queryKey: ['surat-masuk', search],

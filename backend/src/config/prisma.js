@@ -257,7 +257,6 @@ function getRelationConfig(modelName, relName) {
       pembuat:          { type: 'belongsTo', table: 'user',            pk: 'id', fk: 'pembuatId',          model: 'user' },
       tataUsaha:        { type: 'belongsTo', table: 'user',            pk: 'id', fk: 'tataUsahaId',        model: 'user' },
       kepala:           { type: 'belongsTo', table: 'user',            pk: 'id', fk: 'kepalaId',           model: 'user' },
-      dewanMasyayikh:   { type: 'belongsTo', table: 'user',            pk: 'id', fk: 'dewanMasyayikhId',   model: 'user' },
       penerimaInternal: { type: 'hasMany',   table: 'penerimainternal', pk: 'id', fk: 'suratId',           model: 'penerimaInternal' },
     },
     suratMasuk: {

@@ -20,10 +20,8 @@ const STATUS_OPTIONS = [
   { value: 'DRAFT', label: 'Draft' },
   { value: 'MENUNGGU_SEKRETARIS', label: 'Menunggu TTD Sekretaris' },
   { value: 'MENUNGGU_KEPALA', label: 'Menunggu TTD Ketua' },
-  { value: 'MENUNGGU_DEWAN_MASYAYIKH', label: 'Menunggu TTD Dewan Masyayikh' },
   { value: 'DITOLAK_SEKRETARIS', label: 'Ditolak Sekretaris' },
   { value: 'DITOLAK_KEPALA', label: 'Ditolak Ketua' },
-  { value: 'DITOLAK_DEWAN_MASYAYIKH', label: 'Ditolak Dewan Masyayikh' },
   { value: 'SELESAI', label: 'Selesai' },
 ]
 
@@ -155,7 +153,6 @@ export default function SuratKeluarPage() {
                     <td className="text-xs text-gray-500">
                       <div>{surat.tataUsaha?.namaLengkap || '—'}</div>
                       <div>{surat.kepala?.namaLengkap || '—'}</div>
-                      <div>{surat.dewanMasyayikh?.namaLengkap || '—'}</div>					  
                     </td>
                     <td>
                       <span className={getStatusClass(surat.status)}>
@@ -171,7 +168,7 @@ export default function SuratKeluarPage() {
                         >
                           <EyeIcon className="w-4 h-4" />
                         </Link>
-                        {user?.role === 'ADMIN' && ['DRAFT', 'DITOLAK_SEKRETARIS', 'DITOLAK_KEPALA', 'DITOLAK_DEWAN_MASYAYIKH'].includes(surat.status) && (
+                        {user?.role === 'ADMIN' && ['DRAFT', 'DITOLAK_SEKRETARIS', 'DITOLAK_KEPALA'].includes(surat.status) && (
                           <Link
                             to={`/surat-keluar/edit/${surat.id}`}
                             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"

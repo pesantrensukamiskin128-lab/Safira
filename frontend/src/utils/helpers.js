@@ -20,10 +20,8 @@ export const getStatusLabel = (status) => {
     DRAFT: 'Draft',
     MENUNGGU_SEKRETARIS: 'Menunggu TTD Sekretaris',
     MENUNGGU_KEPALA: 'Menunggu TTD Ketua',
-    MENUNGGU_DEWAN_MASYAYIKH: 'Menunggu TTD Dewan Masyayikh',
     DITOLAK_SEKRETARIS: 'Ditolak Sekretaris',
     DITOLAK_KEPALA: 'Ditolak Ketua',
-    DITOLAK_DEWAN_MASYAYIKH: 'Ditolak Dewan Masyayikh',
     SELESAI: 'Selesai',
     BARU: 'Baru',
     DIBACA: 'Dibaca',
@@ -37,10 +35,8 @@ export const getStatusClass = (status) => {
     DRAFT: 'status-draft',
     MENUNGGU_SEKRETARIS: 'status-menunggu',
     MENUNGGU_KEPALA: 'status-menunggu',
-    MENUNGGU_DEWAN_MASYAYIKH: 'status-menunggu',
     DITOLAK_SEKRETARIS: 'status-ditolak',
     DITOLAK_KEPALA: 'status-ditolak',
-    DITOLAK_DEWAN_MASYAYIKH: 'status-ditolak',
     SELESAI: 'status-selesai',
     BARU: 'badge bg-blue-100 text-blue-800',
     DIBACA: 'badge bg-gray-100 text-gray-700',
@@ -54,7 +50,6 @@ export const getRoleLabel = (role) => {
     ADMIN: 'Admin',
     SEKRETARIS: 'Sekretaris',
     KEPALA: 'Ketua',
-    DEWAN_MASYAYIKH: 'Dewan Masyayikh',
     PENGURUS: 'Pengurus',
   }
   return labels[role] || role
@@ -65,7 +60,6 @@ export const getRoleColor = (role) => {
     ADMIN: 'bg-purple-100 text-purple-800',
     SEKRETARIS: 'bg-blue-100 text-blue-800',
     KEPALA: 'bg-primary-100 text-primary-800',
-    DEWAN_MASYAYIKH: 'bg-amber-100 text-amber-800',
     PENGURUS: 'bg-gray-100 text-gray-700',
   }
   return colors[role] || 'bg-gray-100 text-gray-700'

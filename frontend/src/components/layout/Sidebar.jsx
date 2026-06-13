@@ -12,8 +12,8 @@ import { useQuery } from '@tanstack/react-query'
 import { organisasiAPI, getUploadUrl } from '../../services/api'
 
 // Role yang setara dengan Ketua & Sekretaris (akses penuh non-admin)
-const PENANDATANGAN = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH']
-const SEMUA         = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'DEWAN_MASYAYIKH', 'PENGURUS']
+const PENANDATANGAN = ['ADMIN', 'SEKRETARIS', 'KEPALA']
+const SEMUA         = ['ADMIN', 'SEKRETARIS', 'KEPALA', 'PENGURUS']
 
 const navItems = [
   { to: '/dashboard',       icon: HomeIcon,                  label: 'Dashboard',        roles: SEMUA },
